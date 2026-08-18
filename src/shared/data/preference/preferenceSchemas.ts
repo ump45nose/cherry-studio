@@ -268,6 +268,8 @@ export interface PreferenceSchemas {
     'data.backup.s3.skip_backup_file': boolean
     // redux/settings/s3.syncInterval
     'data.backup.s3.sync_interval': number
+    // target-key-definitions/complex/complex
+    'data.backup.webdav.allow_self_signed_tls': boolean
     // redux/settings/webdavAutoSync
     'data.backup.webdav.auto_sync': boolean
     // redux/settings/webdavDisableStream
@@ -670,6 +672,7 @@ export const DefaultPreferences: PreferenceSchemas = {
     'data.backup.s3.secret_access_key': '',
     'data.backup.s3.skip_backup_file': false,
     'data.backup.s3.sync_interval': 0,
+    'data.backup.webdav.allow_self_signed_tls': false,
     'data.backup.webdav.auto_sync': false,
     'data.backup.webdav.disable_stream': false,
     'data.backup.webdav.host': '',
@@ -856,7 +859,7 @@ export const DefaultPreferences: PreferenceSchemas = {
 
 /**
  * 生成统计:
- * - 总配置项: 256
+ * - 总配置项: 257
  * - electronStore项: 2
  * - redux项: 171
  * - localStorage项: 0
