@@ -72,7 +72,7 @@ Anchor shapes:
 | Format | Anchor |
 | --- | --- |
 | xlsx | `{"format":"xlsx","sheet":"Sheet1","range":"A1:C10"}` (range may be one cell) |
-| docx | `{"format":"docx","paragraph":3,"charRange":[0,12]}` (`charRange` optional; ordinal counts body-level paragraphs only, tables excluded) |
+| docx | `{"format":"docx","paragraph":3,"paraId":"502E8D33","charRange":[0,12]}` (`paraId` optional = the paragraph's `w14:paraId`, resolved first when present; `charRange` optional; ordinal counts body-level paragraphs only, tables excluded) |
 | pdf | `{"format":"pdf","page":3,"charRange":[0,120]}` (`charRange` optional, applies to extracted text) |
 | pptx | `{"format":"pptx","slide":2,"nodeId":"4","paragraph":0,"tableCell":{"row":1,"col":0}}` (`slide` is one-based; `nodeId` is the OOXML shape id — omit for the whole slide; `paragraph` and `tableCell` are optional, mutually exclusive, and only valid together with `nodeId`) |
 
@@ -128,8 +128,8 @@ styles, charts, images, and macros in untouched parts survive exactly. Edit shap
   expression lives in one member and the others only reference it, so overwriting a member
   would strip the formula from cells you never named. Rewrite such a range with `openpyxl`.
   Coordinates outside the worksheet grid (past XFD or row 1048576) are refused too.
-- `{"format":"docx","replacements":[{"paragraph":3,"text":"new text"}]}` — the
-  paragraph keeps its paragraph style and the first run's character style; extra run-level
+- `{"format":"docx","replacements":[{"paragraph":3,"text":"new text","paraId":"502E8D33","expectText":"old text"}]}` —
+  the paragraph keeps its paragraph style and the first run's character style; extra run-level
   styling within that one paragraph is flattened into the new text.
   **`text` must be the complete new paragraph.** The whole body paragraph is replaced, and
   `charRange` does not narrow that — feeding back a `charRange` slice as `text` silently
@@ -141,10 +141,20 @@ styles, charts, images, and macros in untouched parts survive exactly. Edit shap
   have no place in the rebuilt run and would simply vanish — a dropped `w:del` would even
   accept a pending deletion on the user's behalf. Edit those with `python-docx`
   (`uv run --with python-docx python`), which preserves inline structure.
+  `paraId` (optional) is resolved before the ordinal; a disagreement between the two is an
+  error, never a silent pick. `expectText` (optional but strongly recommended) is a hard
+  gate: the target paragraph's current text must match it after whitespace normalization or
+  the edit is refused. **Take its value from an extract of the same paragraph taken without
+  `charRange`** — the gate compares the whole paragraph, and a selection-ref `excerpt` is
+  truncated at 2000 chars and may span more than the edit target.
 - Any text written into a cell or paragraph must be storable in XML: control characters
   other than tab, newline and carriage return are refused. Text extracted from a deck can
   carry them (python-pptx maps a soft line break to `\x0B`), so strip them before feeding
   extracted text back in as an edit value.
+
+Text comparisons on both sides of this skill use one normalization rule, identical
+to the renderer's `normalizeSelectionText`: NFC-normalize, collapse every whitespace
+run to a single space, trim the ends.
 
 ### Generate — write ad-hoc library code for new documents
 
