@@ -529,6 +529,9 @@ describe('BackupManager direct v2 data compatibility', () => {
     const result = await backupManager.backup({} as Electron.IpcMainInvokeEvent, 'backup.zip', '/backups')
 
     expect(result).toBe('/backups/backup.zip')
+    // S8 wiring lock: the archive must be created owner-only (mocked stream,
+    // so this asserts the call, not the on-disk mode — fs.test.ts covers that).
+    expect(mockCreateAtomicWriteStream).toHaveBeenCalledWith('/backups/backup.zip', { mode: 0o600 })
     expect(mockChannelManager.pause).toHaveBeenCalledOnce()
     expect(mockChannelManager.drainInFlight).toHaveBeenCalledWith({ timeoutMs: 30_000 })
     expect(mockChannelManager.drainInFlight.mock.invocationCallOrder[0]).toBeLessThan(
