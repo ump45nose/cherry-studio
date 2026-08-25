@@ -10,10 +10,8 @@ type BackupErrorFallbackKey =
   | 'settings.data.webdav.backup.manager.fetch.error'
   | 'settings.data.webdav.backup.manager.delete.error'
 
-// Node TLS failures surface over IPC as plain Error messages (error.code is
-// lost crossing the boundary), so match on message text instead of codes.
-// Chain-trust failures only: expiry / not-yet-valid / hostname-mismatch need a
-// certificate fix, not a verification bypass, and must not trigger this hint.
+// error.code is lost crossing IPC, so match on message text. Chain-trust
+// failures only — expiry/hostname issues need a cert fix, not a bypass.
 const TLS_CERTIFICATE_FAILURE_PATTERNS = [
   'unable to verify the first certificate',
   'unable to get local issuer certificate',

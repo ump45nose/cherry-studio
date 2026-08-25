@@ -477,11 +477,8 @@ describe('BackupManager direct v2 data compatibility', () => {
   })
 
   it('pre-tightens an existing legacy archive to 0600 before overwriting it', async () => {
-    // The legacy JSON path writes via fs.createWriteStream, whose mode only
-    // applies at creation — an existing 0644 target must be chmod'd BEFORE the
-    // stream opens, or an overwrite keeps the loose mode (S8). The path calls
-    // createWriteStream twice (data.json first, then the archive) — fresh
-    // Writable per call, and finalize ends every instance.
+    // createWriteStream's mode applies only at creation, so an existing 0644
+    // archive needs chmod before the stream opens (two calls per run, fresh Writable each).
     const outputs: Writable[] = []
     vi.mocked(fs.createWriteStream).mockImplementation(() => {
       const stream = new Writable({

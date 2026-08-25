@@ -162,9 +162,8 @@ class BackupManager {
   async cleanupStaleTempArtifacts(): Promise<void> {
     const cutoff = Date.now() - STALE_TEMP_ARTIFACT_AGE_MS
 
-    // Best-effort boot hardening: fix pre-existing 0755 roots even when no
-    // operation runs. Both roots live in the shared OS temp tree (S8); ENOENT
-    // (never used yet) is expected and silent.
+    // Best-effort boot hardening: pre-existing 0755 roots are fixed even with
+    // no operation running; ENOENT (never used yet) is expected and silent.
     await this.hardenStagingRootBestEffort(this.backupDir)
     await this.hardenStagingRootBestEffort(application.getPath('feature.lan_transfer.temp'))
 

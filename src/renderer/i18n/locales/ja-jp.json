@@ -3581,7 +3581,7 @@
   "settings.data.v1_remigration.final_retained": "元の v1 データは保持され、再起動後に再度インポートされます。",
   "settings.data.v1_remigration.next": "次へ",
   "settings.data.v1_remigration.title": "v1 データを再移行",
-  "settings.data.webdav.allowSelfSignedTls.help": "デフォルトはオフ：WebDAV サーバーの TLS 証明書を検証します。自己署名証明書を使用するサーバー向けのみ有効化してください — 有効にすると中間者が WebDAV パスワードとバックアップデータ全体を傍受するおそれがあります。",
+  "settings.data.webdav.allowSelfSignedTls.help": "デフォルトはオフ：WebDAV サーバーの TLS 証明書を検証します。自己署名証明書またはプライベート CA 発行の証明書を使用するサーバー向けのみ有効化してください — 有効にすると中間者が WebDAV パスワードとバックアップデータ全体を傍受するおそれがあります。",
   "settings.data.webdav.allowSelfSignedTls.title": "自己署名証明書を許可",
   "settings.data.webdav.autoSync.label": "自動バックアップ",
   "settings.data.webdav.autoSync.off": "オフ",

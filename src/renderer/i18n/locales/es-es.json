@@ -3581,7 +3581,7 @@
   "settings.data.v1_remigration.final_retained": "Tus datos v1 originales se conservarán y se importarán de nuevo después de reiniciar.",
   "settings.data.v1_remigration.next": "Siguiente",
   "settings.data.v1_remigration.title": "Repetir la migración de datos de v1",
-  "settings.data.webdav.allowSelfSignedTls.help": "Desactivado por defecto: el certificado TLS del servidor WebDAV se verifica. Actívelo solo para servidores con certificados autofirmados — un atacante (man-in-the-middle) podría interceptar su contraseña de WebDAV y todos los datos de la copia de seguridad.",
+  "settings.data.webdav.allowSelfSignedTls.help": "Desactivado por defecto: el certificado TLS del servidor WebDAV se verifica. Actívelo solo para servidores con certificados autofirmados o de una CA privada — un atacante (man-in-the-middle) podría interceptar su contraseña de WebDAV y todos los datos de la copia de seguridad.",
   "settings.data.webdav.allowSelfSignedTls.title": "Permitir certificados autofirmados",
   "settings.data.webdav.autoSync.label": "Sincronización automática",
   "settings.data.webdav.autoSync.off": "Desactivar",

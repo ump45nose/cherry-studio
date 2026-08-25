@@ -3581,7 +3581,7 @@
   "settings.data.v1_remigration.final_retained": "Исходные данные v1 будут сохранены и повторно импортированы после перезапуска.",
   "settings.data.v1_remigration.next": "Далее",
   "settings.data.v1_remigration.title": "Повторная миграция данных v1",
-  "settings.data.webdav.allowSelfSignedTls.help": "По умолчанию выключено: TLS-сертификат сервера WebDAV проверяется. Включайте только для серверов с самоподписанными сертификатами — злоумышленник (man-in-the-middle) сможет перехватить ваш пароль WebDAV и все данные резервной копии.",
+  "settings.data.webdav.allowSelfSignedTls.help": "По умолчанию выключено: TLS-сертификат сервера WebDAV проверяется. Включайте только для серверов с самоподписанными сертификатами или сертификатами частного удостоверяющего центра — злоумышленник (man-in-the-middle) сможет перехватить ваш пароль WebDAV и все данные резервной копии.",
   "settings.data.webdav.allowSelfSignedTls.title": "Разрешить самоподписанные сертификаты",
   "settings.data.webdav.autoSync.label": "Автоматическое резервное копирование",
   "settings.data.webdav.autoSync.off": "Выключено",

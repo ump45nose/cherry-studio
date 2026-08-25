@@ -12,7 +12,9 @@ WebDAV backups and restores now validate the server's TLS certificate by default
 
 ## Why this matters to the user
 
-Users whose WebDAV server presents a self-signed or private-CA certificate (common for self-hosted NAS setups) will see backup/restore/connection failures with a message pointing at the new setting. Plain-HTTP servers (e.g. LAN `http://` hosts) are not affected.
+Users whose WebDAV server presents a self-signed or private-CA certificate (common for self-hosted NAS setups) will see backup/restore/connection failures. Unverifiable-chain failures show a message pointing at the new setting; other certificate problems (expired, wrong hostname) show a generic failure message — those need the certificate fixed, not verification skipped. Plain-HTTP servers (e.g. LAN `http://` hosts) are not affected.
+
+Nutstore backups use the same transport and are now verified too. `dav.jianguoyun.com` serves a publicly-trusted certificate, so normal environments are unaffected. Networks that intercept TLS (e.g. corporate proxies with an untrusted root) will fail nutstore backups with a generic error — fix the trust environment (install the corporate root certificate) rather than weakening verification; the WebDAV self-signed switch does not apply to nutstore.
 
 ## What the user should do
 
