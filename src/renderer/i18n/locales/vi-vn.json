@@ -538,7 +538,7 @@
   "backup.confirm.button": "Chọn Vị trí Sao lưu",
   "backup.content": "Sao lưu tất cả dữ liệu, bao gồm lịch sử trò chuyện, cài đặt và cơ sở tri thức. Xin lưu ý rằng quá trình sao lưu có thể mất một thời gian, cảm ơn bạn đã kiên nhẫn.",
   "backup.error.active_data_writers": "Một cuộc trò chuyện hoặc Agent vẫn đang chạy. Hãy đợi hoàn tất rồi thử lại.",
-  "backup.error.webdav_tls_certificate": "Không thể xác minh chứng chỉ TLS của máy chủ WebDAV. Nếu máy chủ dùng chứng chỉ tự ký, hãy bật «Cho phép chứng chỉ tự ký» trong Cài đặt → Dữ liệu → WebDAV (điều này làm giảm bảo mật truyền tải).",
+  "backup.error.webdav_tls_certificate": "Không thể xác minh chứng chỉ TLS của máy chủ WebDAV. Nếu máy chủ dùng chứng chỉ tự ký hoặc chứng chỉ từ CA riêng, hãy bật «Cho phép chứng chỉ tự ký» trong Cài đặt → Dữ liệu → WebDAV (điều này làm giảm bảo mật truyền tải).",
   "backup.progress.completed": "Sao lưu đã hoàn tất",
   "backup.progress.compressing": "Đang nén tệp...",
   "backup.progress.copying_database": "Đang sao chép cơ sở dữ liệu...",

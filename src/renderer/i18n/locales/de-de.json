@@ -538,7 +538,7 @@
   "backup.confirm.button": "Backup-Speicherort auswählen",
   "backup.content": "Sichern Sie alle Daten, einschließlich Chat-Verlauf, Einstellungen, Wissensdatenbank und alle anderen Daten. Bitte beachten Sie, dass der Backup-Vorgang einige Zeit in Anspruch nehmen kann. Vielen Dank für Ihre Geduld",
   "backup.error.active_data_writers": "Eine Konversation oder ein Agent läuft noch. Warten Sie, bis sie/er fertig ist, und versuchen Sie es dann erneut.",
-  "backup.error.webdav_tls_certificate": "Das TLS-Zertifikat des WebDAV-Servers konnte nicht überprüft werden. Wenn der Server ein selbstsigniertes Zertifikat verwendet, aktivieren Sie „Selbstsignierte Zertifikate erlauben“ unter Einstellungen → Daten → WebDAV (dies verringert die Übertragungssicherheit).",
+  "backup.error.webdav_tls_certificate": "Das TLS-Zertifikat des WebDAV-Servers konnte nicht überprüft werden. Wenn der Server ein selbstsigniertes oder von einer privaten CA ausgestelltes Zertifikat verwendet, aktivieren Sie „Selbstsignierte Zertifikate erlauben“ unter Einstellungen → Daten → WebDAV (dies verringert die Übertragungssicherheit).",
   "backup.progress.completed": "Backup abgeschlossen",
   "backup.progress.compressing": "Dateien werden komprimiert...",
   "backup.progress.copying_database": "Datenbank wird kopiert...",

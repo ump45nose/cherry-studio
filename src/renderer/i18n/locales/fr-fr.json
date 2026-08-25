@@ -538,7 +538,7 @@
   "backup.confirm.button": "Sélectionner l'emplacement de sauvegarde",
   "backup.content": "Sauvegarder toutes les données, y compris l'historique des conversations, les paramètres et la base de connaissances. Veuillez noter que le processus de sauvegarde peut prendre un certain temps, merci de votre patience.",
   "backup.error.active_data_writers": "Une conversation ou un agent est toujours en cours d'exécution. Attendez qu'il se termine, puis réessayez.",
-  "backup.error.webdav_tls_certificate": "Impossible de vérifier le certificat TLS du serveur WebDAV. Si le serveur utilise un certificat auto-signé, activez « Autoriser les certificats auto-signés » dans Paramètres → Données → WebDAV (cela réduit la sécurité du transport).",
+  "backup.error.webdav_tls_certificate": "Impossible de vérifier le certificat TLS du serveur WebDAV. Si le serveur utilise un certificat auto-signé ou une AC privée, activez « Autoriser les certificats auto-signés » dans Paramètres → Données → WebDAV (cela réduit la sécurité du transport).",
   "backup.progress.completed": "Sauvegarde terminée",
   "backup.progress.compressing": "Compression des fichiers...",
   "backup.progress.copying_database": "Copie de la base de données...",

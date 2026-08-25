@@ -302,7 +302,7 @@ export class AutoBackupService extends BaseService {
         maxBackups: preferenceService.get('data.backup.webdav.max_backups'),
         skipBackupFile: preferenceService.get('data.backup.webdav.skip_backup_file'),
         disableStream: preferenceService.get('data.backup.webdav.disable_stream'),
-        allowSelfSignedTls: preferenceService.get('data.backup.webdav.allow_self_signed_tls')
+        allowSelfSignedTls: preferenceService.get('data.backup.webdav.allow_self_signed_tls') ?? false
       }
       const { result: success, cleanupError } = await legacyBackupManager.backupToWebdav(null, config, signal)
       if (success === false) throw new Error('WebDAV automatic backup failed')
