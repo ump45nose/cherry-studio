@@ -505,6 +505,8 @@ describe('BackupManager direct v2 data compatibility', () => {
     await backupManager.backupLegacy({} as Electron.IpcMainInvokeEvent, 'legacy.zip', '{}', '/mock/temp/backup', false)
 
     expect(fs.chmod).toHaveBeenCalledWith('/mock/temp/backup/legacy.zip', 0o600)
+    // New-file guarantee: the stream itself must be opened owner-only.
+    expect(fs.createWriteStream).toHaveBeenCalledWith('/mock/temp/backup/legacy.zip', { mode: 0o600 })
     const chmodCalls = vi.mocked(fs.chmod).mock.calls
     const archiveChmodIndex = chmodCalls.findIndex((call) => String(call[0]).endsWith('legacy.zip'))
     const archiveOpenIndex = vi
@@ -515,6 +517,52 @@ describe('BackupManager direct v2 data compatibility', () => {
     expect(vi.mocked(fs.chmod).mock.invocationCallOrder[archiveChmodIndex]).toBeLessThan(
       vi.mocked(fs.createWriteStream).mock.invocationCallOrder[archiveOpenIndex]
     )
+  })
+
+  it('aborts the backup when staging-dir chmod fails (fail-closed)', async () => {
+    vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
+      if (String(target).includes('create-operation-id')) {
+        throw Object.assign(new Error('EACCES: permission denied'), { code: 'EACCES' })
+      }
+      return undefined as never
+    })
+    const { archive } = mockArchiveClose()
+
+    await expect(backupManager.backup({} as Electron.IpcMainInvokeEvent, 'backup.zip', '/backups')).rejects.toThrow(
+      'Failed to restrict backup staging dir permissions'
+    )
+    expect(archive.finalize).not.toHaveBeenCalled()
+  })
+
+  it('hardens the default LAN staging dir but leaves user-chosen destinations alone', async () => {
+    const outputs: Writable[] = []
+    vi.mocked(fs.createWriteStream).mockImplementation(() => {
+      const stream = new Writable({
+        write(_c, _e, cb) {
+          cb()
+        }
+      })
+      outputs.push(stream)
+      return stream as never
+    })
+    const archive = {
+      on: vi.fn().mockReturnThis(),
+      pipe: vi.fn(),
+      directory: vi.fn(),
+      finalize: vi.fn(() => outputs.forEach((stream) => stream.end()))
+    }
+    vi.mocked(ZipArchive).mockReturnValue(archive as never)
+    vi.spyOn(backupManager as any, 'getDirSize').mockResolvedValue(1)
+    vi.spyOn(backupManager as any, 'copyDirWithProgress').mockResolvedValue(undefined)
+    vi.mocked(fs.chmod).mockClear()
+
+    await backupManager.createLanTransferBackup({} as Electron.IpcMainInvokeEvent, '{}')
+    expect(fs.chmod).toHaveBeenCalledWith('/tmp/cherry-studio/lan-transfer', 0o700)
+
+    vi.mocked(fs.chmod).mockClear()
+    await backupManager.createLanTransferBackup({} as Electron.IpcMainInvokeEvent, '{}', '/user/chosen/dir')
+    const lanChmod = vi.mocked(fs.chmod).mock.calls.find((c) => String(c[0]).includes('lan-transfer'))
+    expect(lanChmod).toBeUndefined()
   })
 
   it('writes a version 7 archive with complete Data, IndexedDB, Local Storage, and cache.json', async () => {
