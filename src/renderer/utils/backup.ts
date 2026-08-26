@@ -26,12 +26,18 @@ function isTlsCertificateFailure(error: unknown): boolean {
   return TLS_CERTIFICATE_FAILURE_PATTERNS.some((pattern) => message.includes(pattern))
 }
 
+// Closed set: every key this mapper can select, so a typo cannot compile.
+type BackupMessageKey =
+  | BackupErrorFallbackKey
+  | 'backup.error.active_data_writers'
+  | 'backup.error.webdav_tls_certificate'
+
 export function getLocalizedBackupErrorMessage(
   error: unknown,
   fallbackKey: BackupErrorFallbackKey = 'message.backup.failed',
   options?: { tlsCertificateHint?: boolean }
 ): string {
-  let messageKey: Parameters<typeof i18n.t>[0] = fallbackKey
+  let messageKey: BackupMessageKey = fallbackKey
   if (error instanceof Error && error.message.includes(BACKUP_ACTIVE_WRITERS_ERROR_CODE)) {
     messageKey = 'backup.error.active_data_writers'
   } else if (options?.tlsCertificateHint === true && isTlsCertificateFailure(error)) {

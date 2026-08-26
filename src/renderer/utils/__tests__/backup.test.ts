@@ -45,6 +45,11 @@ describe('getLocalizedBackupErrorMessage', () => {
         tlsCertificateHint: true
       })
     ).toBe('localized:backup.error.webdav_tls_certificate')
+    expect(
+      getLocalizedBackupErrorMessage(new Error('unable to get issuer certificate'), undefined, {
+        tlsCertificateHint: true
+      })
+    ).toBe('localized:backup.error.webdav_tls_certificate')
     // Chain failure spelled without hyphens: both spellings occur in the wild.
     expect(
       getLocalizedBackupErrorMessage(new Error('self signed certificate in certificate chain'), undefined, {

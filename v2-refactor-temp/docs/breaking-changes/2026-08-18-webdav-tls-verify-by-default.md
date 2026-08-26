@@ -26,4 +26,4 @@ On POSIX systems, backup archives (including local backups written into user-cho
 
 ## Notes for release manager
 
-The failure toast for certificate errors guides users to the setting.
+The failure toast for chain-trust certificate failures guides users to the setting; other certificate failures keep the generic copy.

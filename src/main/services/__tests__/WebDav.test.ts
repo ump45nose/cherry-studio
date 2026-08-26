@@ -69,7 +69,9 @@ describe('WebDav TLS verification (S6)', () => {
     servers.push(server)
     const webdav = new WebDav({ webdavHost: `https://127.0.0.1:${port}` })
 
-    await expect(webdav.checkConnection()).rejects.toThrow()
+    // The raw chain-trust message must survive the client layer: the renderer
+    // matcher classifies on this text to surface the opt-in guidance.
+    await expect(webdav.checkConnection()).rejects.toThrow(/self-signed certificate/i)
   })
 
   it('accepts the self-signed certificate when allowSelfSignedTls is opted in', async () => {
@@ -113,6 +115,6 @@ describe('WebDav TLS verification (S6)', () => {
       allowSelfSignedTls: false
     })
 
-    await expect(webdav.checkConnection()).rejects.toThrow()
+    await expect(webdav.checkConnection()).rejects.toThrow(/self-signed certificate/i)
   })
 })
