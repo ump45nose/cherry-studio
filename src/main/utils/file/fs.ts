@@ -610,6 +610,9 @@ export function createAtomicWriteStream(target: AbsoluteFilePath, options?: { mo
 /**
  * Create a stream whose tmp file is handed to `onPrepared` after fsync.
  * The stream emits `finish` only after that callback resolves.
+ * `options.mode` follows the `atomicWriteFile` contract: applied to the tmp
+ * file at open(2), and `prepared.commit()`'s rename carries it onto the
+ * target, replacing whatever mode a pre-existing target had.
  */
 export function createPreparedAtomicWriteStream(
   target: AbsoluteFilePath,
