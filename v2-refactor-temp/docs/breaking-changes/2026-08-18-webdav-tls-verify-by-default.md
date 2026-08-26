@@ -8,7 +8,7 @@ date: 2026-08-18
 
 ## What changed
 
-WebDAV backups and restores now validate the server's TLS certificate by default. Previously any certificate — including one presented by a man-in-the-middle — was accepted. A new setting "Allow Self-Signed Certificates" (Settings → Data → WebDAV) restores the old behavior for servers that use self-signed or private-CA certificates.
+WebDAV backups and restores now validate the server's TLS certificate by default. Previously any certificate — including one presented by a man-in-the-middle — was accepted. A new setting "Allow Self-Signed Certificates" (Settings → Data → WebDAV) restores the old behavior: when enabled, certificate verification is skipped entirely for that server (expired and wrong-hostname certificates are accepted too, not just self-signed or private-CA ones).
 
 ## Why this matters to the user
 
@@ -18,7 +18,7 @@ Nutstore backups use the same transport and are now verified too. `dav.jianguoyu
 
 ## What the user should do
 
-If your WebDAV server uses a self-signed or private-CA certificate, enable "Allow Self-Signed Certificates" in Settings → Data → WebDAV. Be aware this weakens transport security: a man-in-the-middle could intercept your WebDAV password and backup data. Everyone else needs to do nothing.
+If your WebDAV server uses a self-signed or private-CA certificate, enable "Allow Self-Signed Certificates" in Settings → Data → WebDAV. Note this skips certificate verification entirely for that server — a man-in-the-middle could then intercept your WebDAV password and backup data. Everyone else needs to do nothing.
 
 ## Notes for release manager
 

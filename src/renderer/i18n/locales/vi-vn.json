@@ -3581,7 +3581,7 @@
   "settings.data.v1_remigration.final_retained": "Dữ liệu v1 gốc sẽ được giữ lại và nhập lại sau khi khởi động lại.",
   "settings.data.v1_remigration.next": "Tiếp theo",
   "settings.data.v1_remigration.title": "Chạy lại quá trình di chuyển dữ liệu v1",
-  "settings.data.webdav.allowSelfSignedTls.help": "Mặc định tắt: chứng chỉ TLS của máy chủ WebDAV được xác minh. Chỉ bật cho các máy chủ dùng chứng chỉ tự ký hoặc chứng chỉ từ CA riêng — kẻ tấn công trung gian (man-in-the-middle) có thể chặn mật khẩu WebDAV và toàn bộ dữ liệu sao lưu của bạn.",
+  "settings.data.webdav.allowSelfSignedTls.help": "Mặc định tắt: chứng chỉ TLS của máy chủ WebDAV được xác minh. Khi bật, việc xác minh chứng chỉ bị bỏ qua hoàn toàn cho máy chủ này — mọi chứng chỉ tự ký, từ CA riêng, hết hạn hoặc sai tên máy chủ đều được chấp nhận — kẻ tấn công trung gian (man-in-the-middle) có thể chặn mật khẩu WebDAV và toàn bộ dữ liệu sao lưu của bạn.",
   "settings.data.webdav.allowSelfSignedTls.title": "Cho phép chứng chỉ tự ký",
   "settings.data.webdav.autoSync.label": "Sao lưu tự động",
   "settings.data.webdav.autoSync.off": "Apagado",

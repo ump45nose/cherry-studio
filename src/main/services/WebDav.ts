@@ -29,6 +29,8 @@ export default class WebDav {
       password: params.webdavPass,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
+      // Opt-in skips ALL certificate checks (expired/hostname too) — Node agents
+      // cannot selectively allow self-signed certs; copy must state the full scope.
       ...(params.allowSelfSignedTls === true ? { httpsAgent: new https.Agent({ rejectUnauthorized: false }) } : {})
     })
 

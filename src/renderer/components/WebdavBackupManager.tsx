@@ -100,7 +100,7 @@ export function WebdavBackupManager({
     } finally {
       setLoading(false)
     }
-  }, [webdavHost, webdavUser, webdavPass, webdavPath, allowSelfSignedTls, t])
+  }, [webdavHost, webdavUser, webdavPass, webdavPath, allowSelfSignedTls, tlsCertificateHint, t])
 
   useEffect(() => {
     if (visible) {

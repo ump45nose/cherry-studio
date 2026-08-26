@@ -3581,7 +3581,7 @@
   "settings.data.v1_remigration.final_retained": "原始 v1 数据会保留，并在重启后重新导入。",
   "settings.data.v1_remigration.next": "下一步",
   "settings.data.v1_remigration.title": "重新迁移 v1 数据",
-  "settings.data.webdav.allowSelfSignedTls.help": "默认关闭：将校验 WebDAV 服务器的 TLS 证书。仅在服务器使用自签名或私有 CA 证书时开启——开启后中间人可能截获你的 WebDAV 密码与全部备份数据。",
+  "settings.data.webdav.allowSelfSignedTls.help": "默认关闭：将校验 WebDAV 服务器的 TLS 证书。开启后将完全跳过对该服务器的证书校验——自签、私有 CA、过期或域名不匹配的证书均会被接受，中间人可能截获你的 WebDAV 密码与全部备份数据。",
   "settings.data.webdav.allowSelfSignedTls.title": "允许自签名证书",
   "settings.data.webdav.autoSync.label": "自动备份",
   "settings.data.webdav.autoSync.off": "关闭",

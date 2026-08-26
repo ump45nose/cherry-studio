@@ -220,6 +220,7 @@ const WebDavSettings: FC = () => {
       <SettingRow>
         <SettingRowTitle>{t('settings.data.webdav.allowSelfSignedTls.title')}</SettingRowTitle>
         <Switch
+          aria-label={t('settings.data.webdav.allowSelfSignedTls.title')}
           checked={webdavAllowSelfSignedTls}
           onCheckedChange={(value) => void setWebdavAllowSelfSignedTls(value)}
         />
