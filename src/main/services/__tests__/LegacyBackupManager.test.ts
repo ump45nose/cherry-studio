@@ -476,6 +476,27 @@ describe('BackupManager direct v2 data compatibility', () => {
     expect(fs.chmod).toHaveBeenCalledWith('/tmp/cherry-studio/lan-transfer', 0o700)
   })
 
+  it('keeps boot hardening best-effort: ENOENT silent, other chmod failures warn without blocking', async () => {
+    vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
+      if (String(target).includes('lan-transfer')) {
+        throw Object.assign(new Error('EACCES: permission denied'), { code: 'EACCES' })
+      }
+      if (String(target).includes('/mock/temp/backup')) {
+        throw Object.assign(new Error('ENOENT: no such file or directory'), { code: 'ENOENT' })
+      }
+      return undefined as never
+    })
+
+    await expect(backupManager.cleanupStaleTempArtifacts()).resolves.toBeUndefined()
+
+    // Only the non-ENOENT failure warns; the missing backup root stays silent.
+    expect(mockLogger.warn).toHaveBeenCalledTimes(1)
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      '[cleanupStaleTempArtifacts] Failed to restrict backup staging dir permissions',
+      expect.objectContaining({ dir: '/tmp/cherry-studio/lan-transfer' })
+    )
+  })
+
   it('pre-tightens an existing legacy archive to 0600 before overwriting it', async () => {
     // createWriteStream's mode applies only at creation, so an existing 0644
     // archive needs chmod before the stream opens (two calls per run, fresh Writable each).
@@ -531,6 +552,7 @@ describe('BackupManager direct v2 data compatibility', () => {
     // Aborted before any payload stream was opened (finalize alone would be
     // vacuous — ZipArchive is never constructed on this path).
     expect(fs.createWriteStream).not.toHaveBeenCalled()
+    expect(mockCreateAtomicWriteStream).not.toHaveBeenCalled()
   })
 
   it('hardens the default LAN staging dir but leaves user-chosen destinations alone', async () => {

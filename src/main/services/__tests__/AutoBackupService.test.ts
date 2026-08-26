@@ -405,8 +405,13 @@ describe('AutoBackupService', () => {
     await vi.advanceTimersByTimeAsync(61_000)
 
     expect(legacyBackupManager.backupToWebdav).toHaveBeenCalled()
-    const config = vi.mocked(legacyBackupManager.backupToWebdav).mock.calls[0][1]
-    expect(config.allowSelfSignedTls).toBe(true)
+    // Both webdav and nutstore schedules hit backupToWebdav; select by host,
+    // not by call order.
+    const config = vi
+      .mocked(legacyBackupManager.backupToWebdav)
+      .mock.calls.map(([, callConfig]) => callConfig as { webdavHost?: string; allowSelfSignedTls?: boolean })
+      .find((callConfig) => callConfig.webdavHost === 'https://example.com/dav')
+    expect(config?.allowSelfSignedTls).toBe(true)
   })
 
   it('defaults the flag to false in the config when the preference is unset (fail-closed)', async () => {
@@ -414,7 +419,10 @@ describe('AutoBackupService', () => {
     await recreateService()
     await vi.advanceTimersByTimeAsync(61_000)
 
-    const config = vi.mocked(legacyBackupManager.backupToWebdav).mock.calls[0][1]
-    expect(config.allowSelfSignedTls).toBe(false)
+    const config = vi
+      .mocked(legacyBackupManager.backupToWebdav)
+      .mock.calls.map(([, callConfig]) => callConfig as { webdavHost?: string; allowSelfSignedTls?: boolean })
+      .find((callConfig) => callConfig.webdavHost === 'https://example.com/dav')
+    expect(config?.allowSelfSignedTls).toBe(false)
   })
 })

@@ -291,10 +291,13 @@ async function bestEffortUnlinkTmp(tmp: string, target: string): Promise<void> {
  * is never on disk under a looser mode; the rename carries the mode to the
  * target, replacing whatever mode a pre-existing target had.
  */
+/** Shared option shape of the atomic-write family; see `atomicWriteFile` for the mode contract. */
+type AtomicWriteModeOptions = { mode?: number }
+
 export async function atomicWriteFile(
   target: AbsoluteFilePath,
   data: string | Uint8Array,
-  options?: { mode?: number }
+  options?: AtomicWriteModeOptions
 ): Promise<void> {
   const prepared = await prepareAtomicWrite(target, data, options)
   await prepared.commit()
@@ -457,7 +460,7 @@ class PreparedAtomicWriteImpl implements PreparedAtomicWrite {
 export async function prepareAtomicWrite(
   target: AbsoluteFilePath,
   data: string | Uint8Array,
-  options?: { mode?: number }
+  options?: AtomicWriteModeOptions
 ): Promise<PreparedAtomicWrite> {
   const tmp = tmpNameFor(target)
   const tmpHandle = await fsOpen(tmp, 'w', options?.mode)
@@ -498,7 +501,7 @@ class AtomicWriteStreamImpl extends Writable implements AtomicWriteStream {
   constructor(
     target: AbsoluteFilePath,
     onPrepared: (prepared: PreparedAtomicWrite) => Promise<void>,
-    options?: { mode?: number }
+    options?: AtomicWriteModeOptions
   ) {
     super()
     this.target = target
@@ -597,7 +600,7 @@ class AtomicWriteStreamImpl extends Writable implements AtomicWriteStream {
  * to the target by the rename. See `AtomicWriteStream` JSDoc for the full
  * lifecycle contract.
  */
-export function createAtomicWriteStream(target: AbsoluteFilePath, options?: { mode?: number }): AtomicWriteStream {
+export function createAtomicWriteStream(target: AbsoluteFilePath, options?: AtomicWriteModeOptions): AtomicWriteStream {
   return createPreparedAtomicWriteStream(
     target,
     async (prepared) => {
@@ -617,7 +620,7 @@ export function createAtomicWriteStream(target: AbsoluteFilePath, options?: { mo
 export function createPreparedAtomicWriteStream(
   target: AbsoluteFilePath,
   onPrepared: (prepared: PreparedAtomicWrite) => Promise<void>,
-  options?: { mode?: number }
+  options?: AtomicWriteModeOptions
 ): AtomicWriteStream {
   return new AtomicWriteStreamImpl(target, onPrepared, options)
 }

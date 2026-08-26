@@ -44,4 +44,14 @@ describe('NodeProxyBackend request binding', () => {
     expect(forwardedOptions.agent).toBe(sharedProxyAgent)
     expect('rejectUnauthorized' in forwardedOptions).toBe(false)
   })
+
+  it('does not inject TLS options when the caller agent carries no explicit stance (default verifies)', () => {
+    const { bound, originalMethod, sharedProxyAgent } = bindWithSharedAgent()
+
+    bound('https://example.test/backup', { agent: new https.Agent() })
+
+    const forwardedOptions = originalMethod.mock.calls[0][1]
+    expect(forwardedOptions.agent).toBe(sharedProxyAgent)
+    expect('rejectUnauthorized' in forwardedOptions).toBe(false)
+  })
 })
