@@ -9,9 +9,7 @@ function bindWithSharedAgent() {
   const sharedProxyAgent = new https.Agent()
   const originalMethod = vi.fn()
   // bindHttpMethod is private; exercise the bound wrapper directly
-  const bound = (backend as any).bindHttpMethod(originalMethod, sharedProxyAgent) as (
-    ...args: unknown[]
-  ) => unknown
+  const bound = (backend as any).bindHttpMethod(originalMethod, sharedProxyAgent) as (...args: unknown[]) => unknown
   return { bound, originalMethod, sharedProxyAgent }
 }
 
