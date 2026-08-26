@@ -92,6 +92,19 @@ describe('WebDav TLS verification (S6)', () => {
     await expect(webdav.checkConnection()).resolves.toBe(false)
   })
 
+  it('keeps opt-in plain-http hosts off the verification-skipping agent', async () => {
+    // D5 contract: opting into self-signed TLS must not reroute http traffic
+    // through the https agent — that would fail the handshake here.
+    const { server, port } = await createPlainHttpServer()
+    servers.push(server)
+    const webdav = new WebDav({
+      webdavHost: `http://127.0.0.1:${port}`,
+      allowSelfSignedTls: true
+    })
+
+    await expect(webdav.checkConnection()).resolves.toBe(false)
+  })
+
   it('treats allowSelfSignedTls: false the same as unset (verifies)', async () => {
     const { server, port } = await createTlsServer()
     servers.push(server)

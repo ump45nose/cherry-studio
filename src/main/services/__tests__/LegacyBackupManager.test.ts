@@ -523,12 +523,14 @@ describe('BackupManager direct v2 data compatibility', () => {
       }
       return undefined as never
     })
-    const { archive } = mockArchiveClose()
+    mockArchiveClose()
 
     await expect(backupManager.backup({} as Electron.IpcMainInvokeEvent, 'backup.zip', '/backups')).rejects.toThrow(
       'Failed to restrict backup staging dir permissions'
     )
-    expect(archive.finalize).not.toHaveBeenCalled()
+    // Aborted before any payload stream was opened (finalize alone would be
+    // vacuous — ZipArchive is never constructed on this path).
+    expect(fs.createWriteStream).not.toHaveBeenCalled()
   })
 
   it('hardens the default LAN staging dir but leaves user-chosen destinations alone', async () => {

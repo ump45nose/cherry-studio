@@ -1,4 +1,15 @@
-import { mkdir, mkdtemp, open, readdir, readFile, rm, stat as fsStatPromise, utimes, writeFile } from 'node:fs/promises'
+import {
+  chmod,
+  mkdir,
+  mkdtemp,
+  open,
+  readdir,
+  readFile,
+  rm,
+  stat as fsStatPromise,
+  utimes,
+  writeFile
+} from 'node:fs/promises'
 import type { Server } from 'node:http'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -934,6 +945,23 @@ describe('createAtomicWriteStream', () => {
       stream.end()
     })
     expect(await readFile(target, 'utf-8')).toBe('backup-bytes')
+    expect((await fsStatPromise(target)).mode & 0o777).toBe(0o600)
+  })
+
+  it('tightens an existing loose-mode target when stream-overwriting with options.mode', async () => {
+    if (process.platform === 'win32') return
+    const target = path.join(tmp, 'existing.zip') as AbsoluteFilePath
+    await writeFile(target, 'loose-bytes')
+    await chmod(target, 0o644)
+    expect((await fsStatPromise(target)).mode & 0o777).toBe(0o644)
+    const stream = createAtomicWriteStream(target, { mode: 0o600 })
+    stream.write('tightened')
+    await new Promise<void>((resolve, reject) => {
+      stream.on('finish', resolve)
+      stream.on('error', reject)
+      stream.end()
+    })
+    expect(await readFile(target, 'utf-8')).toBe('tightened')
     expect((await fsStatPromise(target)).mode & 0o777).toBe(0o600)
   })
 
