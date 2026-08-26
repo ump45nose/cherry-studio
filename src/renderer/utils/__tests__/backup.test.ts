@@ -45,6 +45,12 @@ describe('getLocalizedBackupErrorMessage', () => {
         tlsCertificateHint: true
       })
     ).toBe('localized:backup.error.webdav_tls_certificate')
+    // Chain failure spelled without hyphens: both spellings occur in the wild.
+    expect(
+      getLocalizedBackupErrorMessage(new Error('self signed certificate in certificate chain'), undefined, {
+        tlsCertificateHint: true
+      })
+    ).toBe('localized:backup.error.webdav_tls_certificate')
   })
 
   it('does NOT advise the switch for expiry/hostname failures (they need a cert fix, not a bypass)', () => {

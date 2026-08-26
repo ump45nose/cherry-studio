@@ -17,9 +17,7 @@ const TLS_CERTIFICATE_FAILURE_PATTERNS = [
   'unable to get local issuer certificate',
   'unable to get issuer certificate',
   'self-signed certificate',
-  'self signed certificate',
-  'depth_zero_self_signed_cert',
-  'self_signed_cert_in_chain'
+  'self signed certificate'
 ]
 
 function isTlsCertificateFailure(error: unknown): boolean {
