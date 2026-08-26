@@ -27,13 +27,6 @@ interface BackupFile {
   size: number
 }
 
-interface WebdavConfig {
-  webdavHost: string
-  webdavUser?: string
-  webdavPass?: string
-  webdavPath?: string
-}
-
 interface WebdavBackupManagerProps {
   visible: boolean
   onClose: () => void
@@ -89,7 +82,7 @@ export function WebdavBackupManager({
         webdavPass,
         webdavPath,
         allowSelfSignedTls
-      } as WebdavConfig)
+      })
       setBackupFiles(files)
     } catch (error) {
       toast.error(
@@ -168,7 +161,7 @@ export function WebdavBackupManager({
           webdavPass,
           webdavPath,
           allowSelfSignedTls
-        } as WebdavConfig)
+        })
       }
       toast.success(t('settings.data.webdav.backup.manager.delete.success.multiple', { count: selectedRowKeys.length }))
       setSelectedRowKeys([])
@@ -208,7 +201,7 @@ export function WebdavBackupManager({
         webdavPass,
         webdavPath,
         allowSelfSignedTls
-      } as WebdavConfig)
+      })
       toast.success(t('settings.data.webdav.backup.manager.delete.success.single'))
       await fetchBackupFiles()
     } catch (error) {
