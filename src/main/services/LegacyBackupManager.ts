@@ -941,7 +941,10 @@ class BackupManager {
     // staging tree, and any remaining directory is an orphan from a crash
     // before the durable journal commit.
     await fs.remove(stagingRoot)
-    await fs.ensureDir(restoreDir)
+    // Staging holds the full pre-boot user-data snapshot (S8); same fail-closed
+    // hardening as every other staging path.
+    await this.ensurePrivateDir(stagingRoot)
+    await this.ensurePrivateDir(restoreDir)
 
     try {
       const metadata = await this.readDirectBackupMetadata(extractionDir)

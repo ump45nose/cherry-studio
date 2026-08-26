@@ -864,6 +864,29 @@ describe('BackupManager direct v2 data compatibility', () => {
     expect(fs.remove).not.toHaveBeenCalledWith('/mock/userData/restore-staging/operation-id')
   })
 
+  it('hardens the direct-restore staging root with owner-only permissions', async () => {
+    arrangeDirectRestore()
+
+    await (backupManager as any).restoreDirect('/extract')
+
+    expect(fs.chmod).toHaveBeenCalledWith('/mock/userData/restore-staging', 0o700)
+    expect(fs.chmod).toHaveBeenCalledWith('/mock/userData/restore-staging/operation-id', 0o700)
+  })
+
+  it('aborts the direct restore when staging-dir chmod fails (fail-closed)', async () => {
+    vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
+      if (String(target).includes('restore-staging')) {
+        throw Object.assign(new Error('EACCES: permission denied'), { code: 'EACCES' })
+      }
+      return undefined as never
+    })
+
+    await expect((backupManager as any).restoreDirect('/extract')).rejects.toThrow(
+      'Failed to restrict backup staging dir permissions'
+    )
+    expect(fs.copy).not.toHaveBeenCalled()
+  })
+
   it('removes the extracted archive before relaunching', async () => {
     arrangeDirectRestore()
     vi.mocked(fs.pathExists).mockImplementation(async (entryPath) => {
