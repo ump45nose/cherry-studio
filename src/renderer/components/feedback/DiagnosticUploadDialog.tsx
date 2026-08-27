@@ -5,7 +5,6 @@ import {
   ConfirmDialog,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -215,7 +214,6 @@ export function DiagnosticUploadDialog({ initialDescription, onOpenChange, open 
           }}>
           <DialogHeader className="px-6 pt-6 pr-12 pb-4">
             <DialogTitle>{t('settings.about.diagnostics.upload.dialog.title')}</DialogTitle>
-            <DialogDescription>{t('settings.about.diagnostics.upload.dialog.description')}</DialogDescription>
           </DialogHeader>
 
           <Scrollbar className="min-h-0 px-6 py-2">
@@ -226,7 +224,7 @@ export function DiagnosticUploadDialog({ initialDescription, onOpenChange, open 
             ) : (
               <form id={uploadFormId} className="space-y-4" onSubmit={handleSubmit}>
                 <section className="space-y-2">
-                  <label htmlFor="diagnostic-description" className="font-medium text-sm">
+                  <label htmlFor="diagnostic-description" className="block font-medium text-sm">
                     {t('settings.about.diagnostics.report.description_label')}
                   </label>
                   <Textarea.Input
@@ -309,14 +307,6 @@ export function DiagnosticUploadDialog({ initialDescription, onOpenChange, open 
                 {inspectResult?.hasWarnings ? (
                   <Alert type="warning" showIcon description={t('settings.about.diagnostics.warning')} />
                 ) : null}
-                <Alert
-                  type="info"
-                  showIcon
-                  message={t('settings.about.diagnostics.upload.privacy.title')}
-                  description={t('settings.about.diagnostics.upload.privacy.description', {
-                    size: formatBytes(inspectResult?.sourceLimitBytes ?? 50 * 1024 * 1024)
-                  })}
-                />
                 <label className="flex cursor-pointer items-start gap-3 text-sm" htmlFor="diagnostic-acknowledgement">
                   <Checkbox
                     id="diagnostic-acknowledgement"
@@ -425,11 +415,7 @@ function UploadResultContent({
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">{t('settings.about.diagnostics.report.feedback_id')}</span>
             <code className="break-all">{result.reportId}</code>
-            <CopyButton
-              textToCopy={result.reportId}
-              aria-label={t('settings.about.diagnostics.report.copy_id')}
-              successFeedback="icon"
-            />
+            <CopyButton textToCopy={result.reportId} aria-label={t('settings.about.diagnostics.report.copy_id')} />
           </div>
         </div>
       </Alert>

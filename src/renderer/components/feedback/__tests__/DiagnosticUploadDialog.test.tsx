@@ -14,13 +14,14 @@ const mocks = vi.hoisted(() => ({
   loggerError: vi.fn(),
   request: vi.fn(),
   toastError: vi.fn(),
+  toastSuccess: vi.fn(),
   translations: {
     'settings.about.diagnostics.actions.cancel': 'Cancel',
     'settings.about.diagnostics.actions.close': 'Close',
     'settings.about.diagnostics.actions.reveal': 'Show in folder',
     'settings.about.diagnostics.inspecting': 'Inspecting diagnostic data…',
     'settings.about.diagnostics.report.acknowledgement':
-      'I understand that the description and selected diagnostic data will be sent privately to Cherry.',
+      'I understand that diagnostic data may contain sensitive information and agree to send this content to Cherry Studio for troubleshooting.',
     'settings.about.diagnostics.report.copy_id': 'Copy feedback ID',
     'settings.about.diagnostics.report.description_label': 'Problem description',
     'settings.about.diagnostics.report.description_required': 'A problem description is required',
@@ -58,7 +59,10 @@ vi.mock('@renderer/services/LoggerService', () => ({
 }))
 
 vi.mock('@renderer/services/toast', () => ({
-  toast: { error: (...args: unknown[]) => mocks.toastError(...args) }
+  toast: {
+    error: (...args: unknown[]) => mocks.toastError(...args),
+    success: (...args: unknown[]) => mocks.toastSuccess(...args)
+  }
 }))
 
 vi.mock('react-i18next', () => ({
@@ -78,24 +82,16 @@ const inspectResult: OutputFor<'diagnostics.bundle.inspect'> = {
 }
 
 const bundleId = '9de71f3c-f4cf-4311-a3f3-86f12a930451'
-const reportId = 'df543a7e-5a76-4624-b42d-ed7b997d943e'
+const reportId = 'opaque-report-id'
 const fallbackPath = AbsoluteFilePathSchema.parse('/tmp/cherry-studio-diagnostics.zip')
-const bundleSummary = {
-  archiveBytes: 2_000,
-  bundleId,
-  hasWarnings: false,
-  includedFileCount: 2,
-  omittedFileCount: 0
-}
 
 const uploadedResult: Extract<OutputFor<'diagnostics.bundle.upload'>, { status: 'uploaded' }> = {
-  ...bundleSummary,
   reportId,
   status: 'uploaded'
 }
 
 const submissionFailedResult: Extract<OutputFor<'diagnostics.bundle.upload'>, { status: 'submission_failed' }> = {
-  ...bundleSummary,
+  bundleId,
   fileName: 'cherry-studio-diagnostics.zip',
   filePath: fallbackPath,
   reason: 'service_unavailable',
@@ -103,7 +99,7 @@ const submissionFailedResult: Extract<OutputFor<'diagnostics.bundle.upload'>, { 
 }
 
 const submissionUnknownResult: Extract<OutputFor<'diagnostics.bundle.upload'>, { status: 'submission_unknown' }> = {
-  ...bundleSummary,
+  bundleId,
   fileName: 'cherry-studio-diagnostics.zip',
   filePath: fallbackPath,
   status: 'submission_unknown'
@@ -113,7 +109,7 @@ async function completeReview(user: ReturnType<typeof userEvent.setup>, descript
   await user.type(screen.getByRole('textbox', { name: 'Problem description' }), description)
   await user.click(
     screen.getByRole('checkbox', {
-      name: 'I understand that the description and selected diagnostic data will be sent privately to Cherry.'
+      name: 'I understand that diagnostic data may contain sensitive information and agree to send this content to Cherry Studio for troubleshooting.'
     })
   )
   await waitFor(() => expect(screen.getByRole('button', { name: 'Submit diagnostic report' })).toBeEnabled())
@@ -153,6 +149,20 @@ describe('DiagnosticUploadDialog', () => {
     await waitFor(() => expect(screen.queryByText('Inspecting diagnostic data…')).not.toBeInTheDocument())
   })
 
+  it('initializes an editable draft once without replacing user edits on parent rerender', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(<DiagnosticUploadDialog initialDescription="draft A" open onOpenChange={vi.fn()} />)
+
+    const description = screen.getByRole('textbox', { name: 'Problem description' })
+    expect(description).toHaveValue('draft A')
+    await user.type(description, ' with user edits')
+
+    rerender(<DiagnosticUploadDialog initialDescription="draft B" open onOpenChange={vi.fn()} />)
+
+    expect(description).toHaveValue('draft A with user edits')
+    expect(mocks.request.mock.calls.filter(([route]) => route === 'diagnostics.bundle.upload')).toHaveLength(0)
+  })
+
   it('validates an empty description on submit and keeps the error current while editing', async () => {
     const user = userEvent.setup()
     const { rerender } = render(<DiagnosticUploadDialog open onOpenChange={vi.fn()} />)
@@ -160,7 +170,7 @@ describe('DiagnosticUploadDialog', () => {
     const submit = screen.getByRole('button', { name: 'Submit diagnostic report' })
     const description = screen.getByRole('textbox', { name: 'Problem description' })
     const acknowledgement = screen.getByRole('checkbox', {
-      name: 'I understand that the description and selected diagnostic data will be sent privately to Cherry.'
+      name: 'I understand that diagnostic data may contain sensitive information and agree to send this content to Cherry Studio for troubleshooting.'
     })
 
     await user.click(acknowledgement)
@@ -200,7 +210,7 @@ describe('DiagnosticUploadDialog', () => {
     await user.paste('x'.repeat(4097))
     await user.click(
       screen.getByRole('checkbox', {
-        name: 'I understand that the description and selected diagnostic data will be sent privately to Cherry.'
+        name: 'I understand that diagnostic data may contain sensitive information and agree to send this content to Cherry Studio for troubleshooting.'
       })
     )
 
@@ -219,7 +229,7 @@ describe('DiagnosticUploadDialog', () => {
     await completeReview(user)
     const description = screen.getByRole('textbox', { name: 'Problem description' })
     const acknowledgement = screen.getByRole('checkbox', {
-      name: 'I understand that the description and selected diagnostic data will be sent privately to Cherry.'
+      name: 'I understand that diagnostic data may contain sensitive information and agree to send this content to Cherry Studio for troubleshooting.'
     })
 
     await user.type(description, ' Please investigate. ')
@@ -242,7 +252,7 @@ describe('DiagnosticUploadDialog', () => {
     await completeReview(user)
 
     const acknowledgement = screen.getByRole('checkbox', {
-      name: 'I understand that the description and selected diagnostic data will be sent privately to Cherry.'
+      name: 'I understand that diagnostic data may contain sensitive information and agree to send this content to Cherry Studio for troubleshooting.'
     })
     await user.click(screen.getByRole('radio', { name: 'Last 3 days' }))
     expect(acknowledgement).not.toBeChecked()
@@ -278,7 +288,6 @@ describe('DiagnosticUploadDialog', () => {
     expect(screen.getByRole('button', { name: 'Submitting diagnostic report…' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
     await user.keyboard('{Escape}')
     const overlay = document.querySelector<HTMLElement>('[data-ui~="part:dialog-overlay"]')
     expect(overlay).not.toBeNull()
@@ -292,6 +301,7 @@ describe('DiagnosticUploadDialog', () => {
     expect(screen.queryByText(bundleId)).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Copy feedback ID' }))
     expect(clipboardWrite).toHaveBeenCalledWith(reportId)
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('message.copy.success')
   })
 
   it('offers explicit recovery actions for a rejected submission without opening the manual form automatically', async () => {
