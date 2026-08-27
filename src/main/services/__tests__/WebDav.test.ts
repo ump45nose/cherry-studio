@@ -54,7 +54,7 @@ function createPlainHttpServer(): Promise<{ server: http.Server; port: number }>
 const closeServer = (server: https.Server | http.Server) =>
   new Promise<void>((resolve) => server.close(() => resolve()))
 
-describe('WebDav TLS verification (S6)', () => {
+describe('WebDav TLS verification', () => {
   let servers: Array<https.Server | http.Server>
 
   beforeEach(() => {
@@ -95,8 +95,8 @@ describe('WebDav TLS verification (S6)', () => {
   })
 
   it('keeps opt-in plain-http hosts off the verification-skipping agent', async () => {
-    // D5 contract: opting into self-signed TLS must not reroute http traffic
-    // through the https agent — that would fail the handshake here.
+    // Opting into self-signed TLS must not reroute http traffic through the
+    // https agent — that would fail the handshake here.
     const { server, port } = await createPlainHttpServer()
     servers.push(server)
     const webdav = new WebDav({

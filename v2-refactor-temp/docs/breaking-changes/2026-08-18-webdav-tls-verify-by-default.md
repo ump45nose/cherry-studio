@@ -10,7 +10,7 @@ date: 2026-08-18
 
 WebDAV backups and restores now validate the server's TLS certificate by default. Previously any certificate — including one presented by a man-in-the-middle — was accepted. A new setting "Allow Self-Signed Certificates" (Settings → Data → WebDAV) restores the old behavior: when enabled, certificate verification is skipped entirely for that server (expired and wrong-hostname certificates are accepted too, not just self-signed or private-CA ones).
 
-Backup archives and staging directories are additionally written owner-only (0600/0700 — POSIX semantics only; Windows does not enforce these modes). Archives downloaded for a WebDAV/S3 restore keep default file modes but rest inside owner-only (0700) staging directories. On filesystems that reject `chmod` outright (FAT/exFAT-class mounts), backup and restore abort with a clear error instead of writing under looser permissions.
+Backup archives and staging directories are additionally written owner-only (0600/0700 — POSIX semantics only; Windows does not enforce these modes). Archives downloaded for a WebDAV/S3 restore keep default file modes but rest inside owner-only (0700) staging directories. On filesystems that reject `chmod` outright (FAT/exFAT-class mounts), operations that must tighten an existing directory or archive abort rather than writing under looser permissions; v2 archive writes apply the mode at file creation instead. These aborts surface through the generic backup failure toast, with the specific cause in the error message.
 
 ## Why this matters to the user
 

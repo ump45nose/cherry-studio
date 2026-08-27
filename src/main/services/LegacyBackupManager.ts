@@ -1455,7 +1455,9 @@ class BackupManager {
   /** Staging dirs hold full-backup content (S8); a chmod failure aborts the
    * backup rather than writing payloads under looser permissions. */
   private async ensurePrivateDir(dir: string): Promise<void> {
-    await fs.ensureDir(dir)
+    // 0700 at creation closes the ensureDir→chmod exposure window; 0700 has no
+    // group/other bits, so umask cannot loosen it.
+    await fs.ensureDir(dir, { mode: BACKUP_TEMP_DIR_MODE })
     await fs.chmod(dir, BACKUP_TEMP_DIR_MODE).catch((error) => {
       throw new Error(`Failed to restrict backup staging dir permissions (${dir}): ${String(error)}`)
     })

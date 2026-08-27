@@ -543,6 +543,52 @@ describe('BackupManager direct v2 data compatibility', () => {
     )
   })
 
+  it('lets the legacy overwrite proceed when pre-tightening hits ENOENT (fresh archive)', async () => {
+    vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
+      if (String(target).endsWith('legacy.zip')) {
+        throw Object.assign(new Error('ENOENT: no such file or directory'), { code: 'ENOENT' })
+      }
+      return undefined as never
+    })
+    const outputs: Writable[] = []
+    vi.mocked(fs.createWriteStream).mockImplementation(() => {
+      const stream = new Writable({
+        write(_c, _e, cb) {
+          cb()
+        }
+      })
+      outputs.push(stream)
+      return stream as never
+    })
+    const archive = {
+      on: vi.fn().mockReturnThis(),
+      pipe: vi.fn(),
+      directory: vi.fn(),
+      finalize: vi.fn(() => outputs.forEach((stream) => stream.end()))
+    }
+    vi.mocked(ZipArchive).mockReturnValue(archive as never)
+    vi.spyOn(backupManager as any, 'getDirSize').mockResolvedValue(1)
+    vi.spyOn(backupManager as any, 'copyDirWithProgress').mockResolvedValue(undefined)
+
+    await backupManager.backupLegacy({} as Electron.IpcMainInvokeEvent, 'legacy.zip', '{}', '/mock/temp/backup', false)
+
+    expect(fs.createWriteStream).toHaveBeenCalledWith('/mock/temp/backup/legacy.zip', { mode: 0o600 })
+  })
+
+  it('aborts the legacy overwrite when pre-tightening fails with a non-ENOENT error', async () => {
+    vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
+      if (String(target).endsWith('legacy.zip')) {
+        throw Object.assign(new Error('EPERM: operation not permitted'), { code: 'EPERM' })
+      }
+      return undefined as never
+    })
+
+    await expect(
+      backupManager.backupLegacy({} as Electron.IpcMainInvokeEvent, 'legacy.zip', '{}', '/mock/temp/backup', false)
+    ).rejects.toThrow('Failed to restrict backup archive permissions')
+    expect(fs.createWriteStream).not.toHaveBeenCalledWith('/mock/temp/backup/legacy.zip', expect.anything())
+  })
+
   it('aborts the backup when staging-dir chmod fails (fail-closed)', async () => {
     vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
       if (String(target).includes('create-operation-id')) {
@@ -899,6 +945,10 @@ describe('BackupManager direct v2 data compatibility', () => {
 
     await (backupManager as any).restoreDirect('/extract')
 
+    // 0700 at creation (umask-immune) plus the tightening chmod for
+    // pre-existing loose dirs.
+    expect(fs.ensureDir).toHaveBeenCalledWith('/mock/userData/restore-staging', { mode: 0o700 })
+    expect(fs.ensureDir).toHaveBeenCalledWith('/mock/userData/restore-staging/operation-id', { mode: 0o700 })
     expect(fs.chmod).toHaveBeenCalledWith('/mock/userData/restore-staging', 0o700)
     expect(fs.chmod).toHaveBeenCalledWith('/mock/userData/restore-staging/operation-id', 0o700)
   })
