@@ -948,6 +948,29 @@ describe('createAtomicWriteStream', () => {
     expect((await fsStatPromise(target)).mode & 0o777).toBe(0o600)
   })
 
+  it('applies options.mode to the tmp file at open time (prepared pause point)', async () => {
+    if (process.platform === 'win32') return
+    const target = path.join(tmp, 'paused.zip') as AbsoluteFilePath
+    let observedTmpMode: number | undefined
+    const stream = createPreparedAtomicWriteStream(
+      target,
+      async () => {
+        // The tmp file is alive at this pause point; exactly one exists, so
+        // a post-commit chmod implementation would be caught here.
+        const [entry] = (await readdir(tmp)).filter((e) => e.includes('.tmp-'))
+        observedTmpMode = (await fsStatPromise(path.join(tmp, entry))).mode & 0o777
+      },
+      { mode: 0o600 }
+    )
+    stream.write('secret')
+    await new Promise<void>((resolve, reject) => {
+      stream.on('finish', resolve)
+      stream.on('error', reject)
+      stream.end()
+    })
+    expect(observedTmpMode).toBe(0o600)
+  })
+
   it('tightens an existing loose-mode target when stream-overwriting with options.mode', async () => {
     if (process.platform === 'win32') return
     const target = path.join(tmp, 'existing.zip') as AbsoluteFilePath

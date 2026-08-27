@@ -164,8 +164,11 @@ class BackupManager {
 
     // Best-effort boot hardening: pre-existing 0755 roots are fixed even with
     // no operation running; ENOENT (never used yet) is expected and silent.
+    // The restore-staging root seals crash-recovered trees too — 0700 on the
+    // root blocks traversal into any pre-existing subtree.
     await this.hardenStagingRootBestEffort(this.backupDir)
     await this.hardenStagingRootBestEffort(application.getPath('feature.lan_transfer.temp'))
+    await this.hardenStagingRootBestEffort(application.getPath('feature.backup.restore.staging'))
 
     try {
       const entries = await fs.readdir(this.backupDir, { withFileTypes: true })

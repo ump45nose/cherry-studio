@@ -120,6 +120,9 @@ const NutstoreSettings: FC = () => {
       setNsConnected(isConnectedToNutstore)
 
       setTimeoutTimer('handleCheckConnection', () => setNsConnected(false), 3000)
+    } catch (error) {
+      toast.error({ timeout: 2000, title: t('settings.data.nutstore.checkConnection.fail') })
+      setNsConnected(false)
     } finally {
       setCheckConnectionLoading(false)
     }

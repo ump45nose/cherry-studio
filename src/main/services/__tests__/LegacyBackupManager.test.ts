@@ -476,6 +476,12 @@ describe('BackupManager direct v2 data compatibility', () => {
     expect(fs.chmod).toHaveBeenCalledWith('/tmp/cherry-studio/lan-transfer', 0o700)
   })
 
+  it('boot-hardens the restore-staging root (seals crash-recovered trees)', async () => {
+    await backupManager.cleanupStaleTempArtifacts()
+
+    expect(fs.chmod).toHaveBeenCalledWith('/mock/userData/restore-staging', 0o700)
+  })
+
   it('keeps boot hardening best-effort: ENOENT silent, other chmod failures warn without blocking', async () => {
     vi.mocked(fs.chmod).mockImplementation(async (target: unknown) => {
       if (String(target).includes('lan-transfer')) {
